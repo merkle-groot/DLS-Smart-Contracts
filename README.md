@@ -1,17 +1,21 @@
 <p align="center">
+  <a href="https://dls-front-end-0.vercel.app/">
+    <img src="./images/logo.jpeg" alt="Logo" width="80" height="80">
   </a>
 
-  <h3 align="center">DSL Ξ </h3>
+  <h3 align="center">DLS Ξ</h3>
 
   <p align="center">
-    Decentralized Lottery System
+    A twist on the traditional lottery
     <br />
     <br />
-    <a href="https://youtu.be/NLAca33Obns">Video Demo</a>
+    <a href="https://dls-front-end-0.vercel.app/">Launch App</a>
+    .
+    <a href="https://youtu.be/JFKBL6t2eQA">Video Demo</a>
     ·
-    <a href="https://github.com/merkle-groot/PSYdoc/issues">Report Bug</a>
+    <a href="https://github.com/merkle-groot/DLS-Smart-Contracts/issues">Report Bug</a>
     ·
-    <a href="https://github.com/merkle-groot/PSYdoc/issues/issues">Request Feature</a>
+    <a href="https://github.com/merkle-groot/DLS-Smart-Contracts/issues/issues">Request Feature</a>
   </p>
 </p>
 
@@ -34,10 +38,8 @@
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
     <li><a href="#contracts">Smart Contracts</a></li>
     <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#sponsorship">Sponsorships</a></li>
     <li><a href="#license">License</a></li>
   </ol>
 </details>
@@ -46,8 +48,116 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-**Video Demo** : [YouTube Link](https://youtu.be/NLAca33Obns) 
+**Video Demo** : [YouTube Link](https://youtu.be/JFKBL6t2eQA) 
+
 
 *What is DLS?*
 
-Decentralized lottery systems offer a solution to the problems associated with traditional lotteries. By leveraging blockchain technology, decentralized lotteries are transparent, secure, and fraud-resistant. Because of the decentralized nature of the blockchain, it's virtually impossible for any individual or group to tamper with the results or cheat the system. Furthermore, decentralized lotteries can have an unlimited number of winners, creating more opportunities for people to win and reducing the vulnerability of lower-income and elderly individuals. If you're looking for a fair and secure way to play the lottery, decentralized lotteries are an excellent option to consider.
+It's a **new take on the traditional lottery system** found in web3, instead of a single lotery winner, we have **multiple**.
+
+*How does it work?*
+
+We borrowed a few ideas from irl lottery systems and 
+introduced the concept of **series** and **number** for a lottery ticket.  
+
+The lottery tickets are divided in to 5 series and within each series there are 2000 tickets.
+
+i.e </br>
+```
+series - [A, B, C, D, E]
+ticketNumbers - [1, 2000]
+```
+
+A user can buy a maximum of one ticket and they have the choice to select the series and ticket number. Once bought, it cannot be sold or transferred. There's a time window of **7 days** since the deployment of **Lotto contract** to buy a ticket.
+
+After 7 days, the contract requests 2 random numbers from the **ChainLink** VRF contract which is used to select the winning ticket.
+
+For e.g - 
+
+If the winning ticket was "A 1438":
+
+* The person holding "A 1438" gets 70% of the pooled funds. (1 winner)
+* The person holding the ticket with the number 1438 but of a different series will get 4% of the pool. (4 winners, "B 1438", "C 1438", "D 1438", "E 1438")
+* The person holding the ticket with the number ending with "438" will get 2% of the pool.
+* The owner (deployer) of the contract gets 4% of the pool.
+
+*Payout Scheme*
+
+<img src="./images/payouts.png" height="200" alt="Logo" >
+
+*What if the winning ticket wasn't bought by anyone?*
+
+* n that case, we shift the contract to the buying period after 2 days of the cash-out period, i.e., the funds locked in the contract are moved forward to a new lottery round.
+
+* The lottery rounds keep happening until, there's a winner with full match.
+
+* **current_epoch** variable is used to keep track of the number of rounds that the contract has been through.
+
+*What problem does it solve?*
+
+In traditional lotteries, only one person wins the entire prize pool, leaving everyone else empty-handed. With DLS, multiple winners are chosen based on their ticket numbers, which means more people have a chance to win and potentially receive a portion of the prize pool
+
+### Built With
+
+* [Brownie](https://eth-brownie.readthedocs.io/)
+* [ChainLink](https://chain.link/)
+
+
+---
+<!-- GETTING STARTED -->
+## Getting Started
+
+To get a local copy up and running follow these steps.
+
+### Prerequisites
+
+This project requires python3 installed
+
+---
+### Installation
+
+1. Install the required dependencies:
+
+```
+pip install -r requirements.txt
+```
+2. Fetch open-zeppelin contracts using pm
+```
+brownie pm install OpenZeppelin/openzeppelin-contracts@0.4.0
+```
+3. Compile the contracts
+```
+brownie compile
+```
+4. Test the contrcts
+```
+brownie test
+```
+---
+</br> 
+
+
+<!-- CONTRACTS -->
+## Contracts
+So far, the smart-contracts have been deployed to 
+1. Sepolia TestNet: 
+    1. Lotto Contract [0xcad983583f0d5940b3be81d4a89db474d63c6993](https://sepolia.etherscan.io/address/0xcad983583f0d5940b3be81d4a89db474d63c6993)
+    2. USDC Contract [0x1FE38D56D80E388F21ea8b0F6AE2A92C681dA1c3](https://sepolia.etherscan.io/address/0x1FE38D56D80E388F21ea8b0F6AE2A92C681dA1c3)
+
+
+<!-- CONTRIBUTING -->
+## Contributing
+
+Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+<!-- LICENSE -->
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
