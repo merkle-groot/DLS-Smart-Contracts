@@ -83,7 +83,7 @@ If the winning ticket was "A 1438":
 
 *Payout Scheme*
 
-<img src="./images/payouts.png" height="200" alt="Logo" >
+<img src="./images/Payouts.png" height="200" alt="Logo" >
 
 *What if the winning ticket wasn't bought by anyone?*
 
