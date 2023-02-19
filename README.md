@@ -115,7 +115,7 @@ To get a local copy up and running follow these steps.
 
 ### Prerequisites
 
-This project requires python3 installed
+This project requires python3 installation
 
 ---
 ### Installation
