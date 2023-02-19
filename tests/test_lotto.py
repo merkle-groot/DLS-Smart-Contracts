@@ -233,7 +233,8 @@ def test_cashouts_not_winner(init_lotto):
 
     assert usdc_token.balanceOf(get_account(5)) == 10*10**18
 
-    lotto.cashOut({"from": get_account(5)})
+    with reverts("Not eligible"):
+        lotto.cashOut({"from": get_account(5)})
 
     assert usdc_token.balanceOf(get_account(5)) == 10*10**18
 

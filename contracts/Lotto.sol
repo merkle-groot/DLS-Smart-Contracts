@@ -1,44 +1,48 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.6.2 <0.9.0;
+pragma solidity ^0.8.0;
 
-import {IERC20} from "./IERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/interfaces/IERC20.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
 contract Lotto is VRFConsumerBaseV2{
     struct LotteryTicket {
-        uint256 series;
-        uint256 ticketNumber;
+        uint64 series;
+        uint192 ticketNumber;
     }
-    uint256 public lastTimestamp;
-    uint256 public state;
-    uint256 public currentEpoch;
-    uint256 public noOfTicketsBought;
+
+    // Addresses
     address public immutable owner;
-    uint256 public constant noOfSeries = 5;
-    uint256 public immutable noOfTicketsPerSeries = 2000;
     address public immutable token;
+
+    // Lotto config
     uint256 public immutable ticketCost;
-    mapping(uint256 => mapping(uint256 => address))
+    uint64 public constant noOfSeries = 5;
+    uint192 public constant noOfTicketsPerSeries = 2000;
+
+    // Lotto state
+    uint256 public lastTimestamp;
+    uint64 public state;
+    uint192 public currentEpoch;
+
+    mapping(uint64 => mapping(uint192 => address))
         public lotteryTicketToHolder;
     mapping(address => LotteryTicket) public holderToLotteryTicket;
     mapping(uint256 => uint256) public epochToPrizePool;
     mapping(uint256 => LotteryTicket) public drawnNumbers;
 
-    // solidity
+    // Interfaces to interact with chainlink
     VRFCoordinatorV2Interface immutable COORDINATOR;
     LinkTokenInterface immutable LINKTOKEN;
 
+    // Chainlink config
     uint64 immutable s_subscriptionId;
     bytes32 immutable s_keyHash;
-    uint32 immutable s_callbackGasLimit = 100000;
-    uint16 immutable s_requestConfirmations = 3;
-    uint32 immutable s_numWords = 2;
-    uint256[] public s_randomWords;
+    uint32 constant s_callbackGasLimit = 100000;
+    uint16 constant s_requestConfirmations = 3;
+    uint32 constant s_numWords = 2;
     uint256 public s_requestId;
-
-    event Log(string message, uint data);
 
     constructor(address token_, uint256 ticketCost_,  uint64 _subscriptionId, address _vrfCoordinator, address _linkToken, bytes32 _keyhash
     ) VRFConsumerBaseV2(_vrfCoordinator) {
@@ -53,7 +57,12 @@ contract Lotto is VRFConsumerBaseV2{
         s_subscriptionId = _subscriptionId;
     }
 
-    function buyTicket(uint256 series_, uint256 ticketNumber_) external {
+    /// @notice Buys a ticket of the given series and ticketNumber
+    /// @dev It reverts if it's in a wrong state, invalid series/ticketNumber provided or 
+    ///      the ticket is already bought/user already has another ticket
+    /// @param series_ The series of the ticket to be bought
+    /// @param ticketNumber_ The ticketNumber to be bought
+    function buyTicket(uint64 series_, uint192 ticketNumber_) external {
         require(state == 0, "Invalid state");
         require(series_ < noOfSeries && series_ != 0, "Invalid series");
         require(
@@ -65,19 +74,22 @@ contract Lotto is VRFConsumerBaseV2{
                 holderToLotteryTicket[msg.sender].ticketNumber == 0,
             "Ticket already bought"
         );
-
+        // Collect the ticketCost from the user
         IERC20(token).transferFrom(msg.sender, address(this), ticketCost);
 
+        // Update state
         lotteryTicketToHolder[series_][ticketNumber_] = msg.sender;
         holderToLotteryTicket[msg.sender] = LotteryTicket(series_,ticketNumber_);
     }
-
+    /// @notice Function to switch to cashoutPeriod after a buyPeriod
+    /// @dev This function is to be called after the 7 days of buyPeriod
     function transitionToCashOutPeriod() external {
         require(state == 0 && block.timestamp >= lastTimestamp + 7 days, "Time period of buying period hasn't passed yet");
         // increment state
         state++;
-        lastTimestamp = block.timestamp;
 
+        // update the last timestamp
+        lastTimestamp = block.timestamp;
         // record the pool funds
         epochToPrizePool[currentEpoch] = IERC20(token).balanceOf(address(this));
 
@@ -85,22 +97,32 @@ contract Lotto is VRFConsumerBaseV2{
         requestRandomWords();
     }
 
+    /// @notice Function to switch to BuyPeriod after a cashoutPeriod
+    /// @dev This function is to be called if there isn't a full match in a cashoutPeriod; It restarts the lottery process
     function transitionToBuyPeriod() external {
         require(state == 1 && block.timestamp >= lastTimestamp + 2 days, "Time period of cash-out period hasn't passed yet");
-        // increment state
+        // Reset the state
         state = 0;
+        // update lastTimestamp and epoch
         lastTimestamp = block.timestamp;
         currentEpoch++;
     }
 
+
+    /// @notice Function to be called after the contract reaches state 2, i.e there's a full match and the lottery process is over;
+    /// @dev It sends the unclaimed funds back to the owner
     function clawBackRemainingfunds() external {
         require(state == 2, "Invalid state");
         require(block.timestamp >= lastTimestamp + 2 days, "Time period of cash-out period hasn't passed yet");
-
+        
+        // Get the pool balance
         uint256 poolBalance = IERC20(token).balanceOf(address(this));
+        // Send the entire funds to the owner
         IERC20(token).transfer(owner, poolBalance);
     }
 
+    /// @notice Function to be called by a lottery holder to claim their winnings
+    /// @dev If the user isn't eligible for winning; the function reverts
     function cashOut() external {
         // Get the winning ticket and user ticket of the current epoch
         LotteryTicket memory seriesWinner = drawnNumbers[currentEpoch];
@@ -108,7 +130,7 @@ contract Lotto is VRFConsumerBaseV2{
         require(state == 1 || state == 2, "Invalid state");
         require(seriesWinner.ticketNumber != 0, "Winner not drawn yet");
         require(userTicket.ticketNumber != 0, "User doesn't hold a ticket");
-
+        
         uint256 totalPrizePool = epochToPrizePool[currentEpoch];
         uint256 userPayout = 0;
         uint256 ownerPayout = 0;
@@ -133,14 +155,17 @@ contract Lotto is VRFConsumerBaseV2{
             userPayout = uint(totalPrizePool * 2) / 100;
         } else {
             // If no numbers match
-            return;
+            revert("Not eligible");
         }
+        // Send the funds won by the user
         IERC20(token).transfer(msg.sender, userPayout);
 
+        // If it's a full match send 4% to the owner
         if (ownerPayout != 0) {
             IERC20(token).transfer(owner, ownerPayout);
         }
 
+        // Remove the lottery from user's holding
         lotteryTicketToHolder[userTicket.series][
             userTicket.ticketNumber
         ] = address(0);
@@ -149,7 +174,7 @@ contract Lotto is VRFConsumerBaseV2{
         userTicket.ticketNumber = 0;
     }
 
-    
+    /// @notice Internal function called by the cashoutPeriod() to request randomness from chainlink
     function requestRandomWords() internal {
         // Will revert if subscription is not set and funded.
         s_requestId = COORDINATOR.requestRandomWords(
@@ -161,11 +186,13 @@ contract Lotto is VRFConsumerBaseV2{
         );
     }
 
-
+    /// @notice Internal function called by the ChainLink contracts to select the winning ticket
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal override {
-        uint256 selectedSeries = randomWords[0] % 5;
-        uint256 selectedTicketNumber = randomWords[1] % 2001;
+        uint64 selectedSeries = uint64(randomWords[0] % 5);
+        uint192 selectedTicketNumber = uint192(randomWords[1] % 2001);
 
         drawnNumbers[currentEpoch] = LotteryTicket(selectedSeries, selectedTicketNumber);
     }
 }
+
+

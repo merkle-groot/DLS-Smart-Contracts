@@ -3,10 +3,7 @@ from brownie import (
     accounts,
     config,
     LinkToken,
-    MockV3Aggregator,
-    MockOracle,
     VRFCoordinatorV2Mock,
-    MockOperator,
     Contract,
     web3,
     USDC,
@@ -28,10 +25,7 @@ BLOCK_CONFIRMATIONS_FOR_VERIFICATION = (
 )
 
 contract_to_mock = {
-    "eth_usd_price_feed": MockV3Aggregator,
     "vrf_coordinator": VRFCoordinatorV2Mock,
-    "oracle": MockOracle,
-    "operator": MockOperator,
     "link_token": LinkToken,
     "usdc_token": USDC,
     "lotto": Lotto
