@@ -36,14 +36,17 @@ networks:
     update_interval: 60
     verify: false
     vrf_coordinator: '0x2Ca8E0C643bDe4C2E08ab1fA0da3401AdAD7734D'
-  mumbai:
+  polygon-test:
     eth_usd_price_feed: '0x0715A7794a1dc8e42615F059dD6e406A6594651A'
     fee: 1000000000000000000
-    keyhash: '0x6e75b569a01ef56d18cab6a8e71e6600d6ce853834d4a5748b720d06f878b3a4'
+    fund_amount: 5000000000000000000
+    keyhash: '0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f'
     link_token: '0x326C977E6efc84E512bB9C30f76E30c160eD06FB'
-    vrf_coordinator: '0x8C7382F9D8f56b33781fE506E897a4F1e2d17255'
+    subscription_id: 3382
+    vrf_coordinator: '0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed'
   sepolia:
     fee: 1000000000000000000
+    fund_amount: 5000000000000000000
     keyhash: '0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c'
     link_token: '0x779877A7B0D9E8603169DdbD7836e478b4624789'
     subscription_id: 54

@@ -36,6 +36,7 @@
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#installation">Installation</a></li>
+        <li><a href="#deployment"> Deployment to Mumbai Testnet </a></li>
       </ul>
     </li>
     <li><a href="#contracts">Smart Contracts</a></li>
@@ -50,6 +51,9 @@
 ## About The Project
 **Video Demo** : [YouTube Link](https://youtu.be/JFKBL6t2eQA) 
 
+**Design Explanation** : [Youtube Link](https://youtu.be/Ovh2FRjWpe4)
+
+---
 
 *What is DLS?*
 
@@ -133,16 +137,44 @@ brownie compile
 ```
 brownie test
 ```
+
+---
+### Deploying to Matic Mumbai Testnet
+
+1. Create an .env file in the root of the directory with 
+
+```
+export WEB3_INFURA_PROJECT_ID='put our project id here'
+export PRIVATE_KEY='Put your wallet private key here'
+```
+2. Load the env variables
+```
+source .env
+```
+3. Create a ChainLink subscription
+```
+brownie run scripts/vrf_scripts/create_subscription.py --network polygon-test      
+```
+4. Update *./scripts/deploy_contracts.py* with the right subscription ID from the last step
+
+5. Deploy the Lotto and USDC contract
+```
+brownie run scripts/deploy_contracts.py --network polygon-test
+```
 ---
 </br> 
 
 
 <!-- CONTRACTS -->
 ## Contracts
-So far, the smart-contracts have been deployed to 
-1. Sepolia TestNet: 
+The smart-contracts have been deployed to 
+1. Matic Mumbai TestNet: 
+    1. Lotto Contract [0x8f23A9b80A49792EDA850A95A61143e4783aD6cC](https://sepolia.etherscan.io/address/0x8f23A9b80A49792EDA850A95A61143e4783aD6cC)
+    2. USDC Contract [0x2aDC2Af787f19f908683c29Ab702D932F8F2e0CE](https://sepolia.etherscan.io/address/0x2aDC2Af787f19f908683c29Ab702D932F8F2e0CE)
+2. Sepolia TestNet: 
     1. Lotto Contract [0xcad983583f0d5940b3be81d4a89db474d63c6993](https://sepolia.etherscan.io/address/0xcad983583f0d5940b3be81d4a89db474d63c6993)
     2. USDC Contract [0x1FE38D56D80E388F21ea8b0F6AE2A92C681dA1c3](https://sepolia.etherscan.io/address/0x1FE38D56D80E388F21ea8b0F6AE2A92C681dA1c3)
+
 
 
 <!-- CONTRIBUTING -->
