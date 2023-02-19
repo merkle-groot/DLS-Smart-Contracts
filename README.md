@@ -169,8 +169,8 @@ brownie run scripts/deploy_contracts.py --network polygon-test
 ## Contracts
 The smart-contracts have been deployed to 
 1. Matic Mumbai TestNet: 
-    1. Lotto Contract [0x8f23A9b80A49792EDA850A95A61143e4783aD6cC](https://sepolia.etherscan.io/address/0x8f23A9b80A49792EDA850A95A61143e4783aD6cC)
-    2. USDC Contract [0x2aDC2Af787f19f908683c29Ab702D932F8F2e0CE](https://sepolia.etherscan.io/address/0x2aDC2Af787f19f908683c29Ab702D932F8F2e0CE)
+    1. Lotto Contract [0x8f23A9b80A49792EDA850A95A61143e4783aD6cC](https://mumbai.polygonscan.com/address/0x8f23A9b80A49792EDA850A95A61143e4783aD6cC)
+    2. USDC Contract [0x2aDC2Af787f19f908683c29Ab702D932F8F2e0CE](https://mumbai.polygonscan.com/address/0x2aDC2Af787f19f908683c29Ab702D932F8F2e0CE)
 2. Sepolia TestNet: 
     1. Lotto Contract [0xcad983583f0d5940b3be81d4a89db474d63c6993](https://sepolia.etherscan.io/address/0xcad983583f0d5940b3be81d4a89db474d63c6993)
     2. USDC Contract [0x1FE38D56D80E388F21ea8b0F6AE2A92C681dA1c3](https://sepolia.etherscan.io/address/0x1FE38D56D80E388F21ea8b0F6AE2A92C681dA1c3)
